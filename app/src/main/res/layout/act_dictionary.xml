@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  xmlns:tools="http://schemas.android.com/tools"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:orientation="vertical"
+			  tools:context=".Act_Launcher">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="20sp"
+			android:layout_margin="5dp"
+			android:textColor="#000"
+			android:text="Word: "/>
+
+		<EditText
+			android:id="@+id/eText"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textColor="#333"
+			/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		>
+
+		<TextView
+			android:id="@+id/tText"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="10dp"
+			android:layout_weight="1"
+			android:text="Input what you want to query!"
+			android:textColor="#201"
+			android:textSize="18sp"/>
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="right">
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="btnQuery"
+				android:text="Query"/>
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>

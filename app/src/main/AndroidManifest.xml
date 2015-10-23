@@ -65,6 +65,8 @@
 		<service
 			android:name=".Ser.Dictionary"
 			android:label="Dictionary"/>
+		<activity android:name=".Act.Act_Dictionary"
+				  android:label="Dictionary"/>
 	</application>
 
 </manifest>

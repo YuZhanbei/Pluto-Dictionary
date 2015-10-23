@@ -3,6 +3,7 @@ package com.fisher.dictionary.Ser;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.fisher.dictionary.Act.Act_Dictionary;
 import com.fisher.dictionary.R;
 import com.fisher.dictionary.Utils.BasicLog;
 import com.fisher.dictionary.Utils.HTTPUtils;
@@ -131,14 +133,14 @@ public class Dictionary extends Service {
 		log( "The text in the paste board is ok -> " + sText );
 		return sText;
 	}
-	private  void fnQueryText(String sWord){
+	private void fnQueryText( String sWord ) {
 		fnQueryTextHTTP( sWord );
 	}
-	private void fnQueryTextHTTP(String sWord){
+	private void fnQueryTextHTTP( String sWord ) {
 		log( Public.url + Public.path + "&q=" + sWord );
 		HTTPUtils.doGetAsyn( Public.url + Public.path + "&q=" + sWord );
 	}
-	public void onEventMainThread(HTTPUtils.RequestCompleteEvent event){
+	public void onEventMainThread( HTTPUtils.RequestCompleteEvent event ) {
 		log( event.getResult() );
 		try {
 			Youdao youdao = new Gson().fromJson( event.getResult(), Youdao.class );
@@ -146,7 +148,7 @@ public class Dictionary extends Service {
 			fnNotice( youdao );
 		} catch ( JsonSyntaxException e ) {
 			e.printStackTrace();
-			fnNotice(  );
+			fnNotice();
 		}
 	}
 
@@ -177,7 +179,11 @@ public class Dictionary extends Service {
 			title += " [" + youdao.getBasic().getUs_phonetic() + "]";
 		String content = youdao.getNoticeContent();
 		String ticker = "I am Ticker";
-		Notification mNotification = new Notification.Builder( this ).setSmallIcon( R.drawable.icon_groot ).setTicker( ticker ).setContentTitle( title ).setContentText( content ).setAutoCancel( true ).build();
+		Notification mNotification = new Notification.Builder( this ).setSmallIcon( R.drawable.icon_groot )
+				//
+				.setContentIntent( PendingIntent.getActivity( this, 0, new Intent( this, Act_Dictionary.class ).putExtra( "msg", youdao.getQuery() ), PendingIntent.FLAG_UPDATE_CURRENT ) )
+				//
+				.setTicker( ticker ).setContentTitle( title ).setContentText( content ).setAutoCancel( true ).build();
 		notificationManager.notify( iNotificationFlag, mNotification );
 
 		record( mWordsLog, title + "\n" + content );
@@ -216,14 +222,14 @@ public class Dictionary extends Service {
 
 
 	private String log( String msg ) {
-		Log.v( this.getClass().getName() + " -->> ", msg+"" );
+		Log.v( this.getClass().getName() + " -->> ", msg + "" );
 		return msg;
 	}
 	private String getRecord( String msg ) {
 		return "------------------->>\r\n" + new Time().fGetFullTime() + "\r\n" + msg + "\r\n\r\n";
 	}
 	private String record( BasicLog log, String msg ) {
-		if(log!=null)
+		if ( log != null )
 			log.log( getRecord( msg ) );
 		return msg;
 	}
