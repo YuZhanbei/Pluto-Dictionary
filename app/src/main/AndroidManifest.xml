@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.fisher.dictionary"
+		  xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+	<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+	<!-- Phone Message -->
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
+
+	<!-- Vibrate -->
+	<uses-permission android:name="android.permission.VIBRATE"/>
+
+	<!-- Screen Light -->
+	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+	<!-- Dialog of Service! -->
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+	<!-- Flash Light! -->
+	<uses-permission android:name="android.permission.CAMERA"/>
+	<uses-feature android:name="android.hardware.camera"/>
+	<uses-permission android:name="android.permission.FLASHLIGHT"/>
+
+	<!-- Set Wallpaper! -->
+	<uses-permission android:name="android.permission.SET_WALLPAPER"/>
+
+	<!-- To Creat ShortCut! -->
+	<uses-permission android:name="android.permission.INSTALL_SHORTCUT"/>
+
+	<!-- To Get Site Position -->
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+	<!-- Others -->
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+	<!-- For QQ Share -->
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+	<uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+	<uses-permission android:name="android.permission.GET_TASKS"/>
+
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+
+	<application
+		android:allowBackup="true"
+		android:icon="@mipmap/ic_launcher"
+		android:label="@string/app_name"
+		android:theme="@style/AppTheme">
+		<activity
+			android:name=".Act_Launcher"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+		<service
+			android:name=".Ser.Dictionary"
+			android:label="Dictionary"/>
+	</application>
+
+</manifest>
