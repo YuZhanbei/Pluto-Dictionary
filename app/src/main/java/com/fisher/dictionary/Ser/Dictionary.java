@@ -14,12 +14,16 @@ import android.util.Log;
 
 import com.fisher.dictionary.R;
 import com.fisher.dictionary.Utils.BasicLog;
+import com.fisher.dictionary.Utils.HTTPUtils;
 import com.fisher.dictionary.Utils.Text;
 import com.fisher.dictionary.Utils.Time;
 import com.fisher.dictionary.Youdao.Public;
 import com.fisher.dictionary.Youdao.Youdao;
 import com.fisher.dictionary.Youdao.YoudaoServer;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
+import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -69,6 +73,8 @@ public class Dictionary extends Service {
 		notificationManager = ( NotificationManager ) getSystemService( Context.NOTIFICATION_SERVICE );
 		initRetrofit();
 		initClipBoard();
+		EventBus.getDefault().register( this );
+		record( mDictionaryLog, "Registered EventBus from dictionary service!" );
 	}
 
 
@@ -87,7 +93,7 @@ public class Dictionary extends Service {
 				//				String sData = item.getText().toString();
 				String sNewPasteBoard = mManager.getText().toString();
 				log( "Now the " + ( ++iCount ) + " pasteboard changed to: " + sNewPasteBoard );
-				if ( ( sNewPasteBoard.equals( "" ) || sNewPasteBoard.equals( sPasteBoard ) ) && ( ( System.currentTimeMillis() - lLastQueryTime ) < 200 ) ) {
+				if ( sNewPasteBoard.equals( "" ) || ( sNewPasteBoard.equals( sPasteBoard ) && ( ( System.currentTimeMillis() - lLastQueryTime ) < 200 ) ) ) {
 					return;
 				}
 				sPasteBoard = sNewPasteBoard;
@@ -125,16 +131,36 @@ public class Dictionary extends Service {
 		log( "The text in the paste board is ok -> " + sText );
 		return sText;
 	}
-	private void fnQueryText( String sData ) {
+	private  void fnQueryText(String sWord){
+		fnQueryTextHTTP( sWord );
+	}
+	private void fnQueryTextHTTP(String sWord){
+		log( Public.url + Public.path + "&q=" + sWord );
+		HTTPUtils.doGetAsyn( Public.url + Public.path + "&q=" + sWord );
+	}
+	public void onEventMainThread(HTTPUtils.RequestCompleteEvent event){
+		log( event.getResult() );
+		try {
+			Youdao youdao = new Gson().fromJson( event.getResult(), Youdao.class );
+			log( youdao.toString() );
+			fnNotice( youdao );
+		} catch ( JsonSyntaxException e ) {
+			e.printStackTrace();
+			fnNotice(  );
+		}
+	}
+
+	private void fnQueryTextRetrofit( String sData ) {
 		query.query( sData, new Callback< Youdao >() {
 			@Override
 			public void success( Youdao youdao, Response response ) {
 				log( youdao.toString() );
+				log( new Gson().toJson( youdao ) );
 				fnNotice( youdao );
 			}
 			@Override
 			public void failure( RetrofitError error ) {
-				log( "Error happened!\r\n" + error.toString()+"\r\n"+error.getUrl()+"\r\n"+error .getMessage()+"\r\n"+error.getBody());
+				log( "Error happened!\r\n" + error.toString() + "\r\n" + error.getUrl() + "\r\n" + error.getMessage() + "\r\n" + error.getBody() );
 				record( mDictionaryLog, "Error happened!\r\n" + error.toString() );
 				record( mWordsLog, "Failed to query word:\r\n" + error.getUrl() );
 				fnNotice();
@@ -166,8 +192,6 @@ public class Dictionary extends Service {
 		String ticker = "I am Ticker";
 		Notification mNotification = new Notification.Builder( this ).setSmallIcon( R.drawable.icon_groot ).setTicker( ticker ).setContentTitle( title ).setContentText( content ).setAutoCancel( true ).build();
 		notificationManager.notify( iNotificationFlag, mNotification );
-
-		record( mWordsLog, title + "\n" + content );
 	}
 
 
@@ -180,6 +204,8 @@ public class Dictionary extends Service {
 		return null;
 	}
 	private void release( ) {
+		EventBus.getDefault().unregister( this );
+		record( mDictionaryLog, "Unregistered EventBus from dictionary service!" );
 		if ( mDictionaryLog != null )
 			mDictionaryLog.close();
 		if ( mPasteBoardLog != null )
@@ -190,14 +216,15 @@ public class Dictionary extends Service {
 
 
 	private String log( String msg ) {
-		Log.v( this.getClass().getName() + " -->> ", msg );
+		Log.v( this.getClass().getName() + " -->> ", msg+"" );
 		return msg;
 	}
 	private String getRecord( String msg ) {
 		return "------------------->>\r\n" + new Time().fGetFullTime() + "\r\n" + msg + "\r\n\r\n";
 	}
 	private String record( BasicLog log, String msg ) {
-		log.log( getRecord( msg ) );
+		if(log!=null)
+			log.log( getRecord( msg ) );
 		return msg;
 	}
 }
